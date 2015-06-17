@@ -1,9 +1,21 @@
-const int button1Pin = 3;
-const int button2Pin = 4;
-const int button3Pin = 5;
-const int button4Pin = 6;
+#include <VirtualWire.h>
+#include <NewRemoteTransmitter.h>
+
+const int numberButtons = 4;
+
+int buttonPin[numberButtons] = {3,4,5,6};
+
+//const int button1Pin = 3;
+//const int button2Pin = 4;
+//const int button3Pin = 5;
+//const int button4Pin = 6;
 
 const int ledPin = 7;
+
+int DeskLightState = 0;
+int BedLightState = 0;
+int DeskSocketState = 0;
+int WirelessChargerState = 0;
 
 int ledState = HIGH;         // the current state of the output pin
 
@@ -25,6 +37,13 @@ long lastDebounceTime3 = 0;
 long lastDebounceTime4 = 0;  
 long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
+char *msg;
+
+// Create a transmitter on address 123, using digital pin 12 to transmit, 
+// with a period duration of 260ms (default), repeating the transmitted
+// code 2^3=8 times.
+NewRemoteTransmitter transmitter(15986790, 12, 260, 3);
+
 void setup() {
   Serial.begin(9600);
   pinMode(button1Pin, INPUT);
@@ -36,6 +55,10 @@ void setup() {
 
   // set initial LED state
   digitalWrite(ledPin, ledState);
+  
+    // Initialise the IO and ISR
+  vw_set_ptt_inverted(true);  // Required for DR3100
+  vw_setup(2000);	      // Bits per sec
 }
 
 void loop() {
@@ -74,8 +97,8 @@ void loop() {
 
       // only toggle the LED if the new button state is HIGH
       if (button1State == HIGH) {
-        ledState = !ledState;
-        Serial.println("Button 1");
+        DeskLightState = !DeskLightState;
+        transmitter.sendUnit(1, DeskLightState);
       }
     }
   }
@@ -84,8 +107,8 @@ void loop() {
         button2State = reading2;
   
         if (button2State == HIGH) {
-          ledState = !ledState;
-          Serial.println("Button 2");
+          BedLightState = !BedLightState;
+          transmitter.sendUnit(3, BedLightState);
         }
       }
     }
@@ -94,8 +117,8 @@ void loop() {
         button3State = reading3;
         
         if (button3State == HIGH) {
-          ledState = !ledState;
-          Serial.println("Button 3");
+          DeskSocketState = !DeskSocketState;
+          transmitter.sendUnit(2, DeskSocketState);
         }
       }
     }
@@ -104,8 +127,8 @@ void loop() {
         button4State = reading4;
   
         if (button4State == HIGH) {
-          ledState = !ledState;
-          Serial.println("Button 4");
+          WirelessChargerState = !WirelessChargerState;
+          transmitter.sendUnit(0, WirelessChargerState);
         }
       }
     }
@@ -119,4 +142,15 @@ void loop() {
   lastButton2State = reading2;
   lastButton3State = reading3;
   lastButton4State = reading4;
+}
+
+void buttonSetup()
+{
+  for (int x=0; x<numberButtons; x++)
+  {
+    lastButtonState[x]=HIGH;
+    lastDebounceTime[x]=0;
+    pinMode(button[x], INPUT_PULLUP);
+    
+  }
 }
