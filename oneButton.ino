@@ -2,13 +2,10 @@
 #include <NewRemoteTransmitter.h>
 
 const int numberButtons = 4;
-const int stateOnePin = 6;
-const int stateTwoPin = 4;
+const int stateOnePin = 4;
+const int stateTwoPin = 6;
 const int turnOff = 0;
 
-int stateOne = 0;
-int stateTwo = 0;
-int stateThree = 0;
 int whatToSwitch = 0;
 
 int buttonPin[numberButtons] = {9,3,7,5};
@@ -117,26 +114,18 @@ void turnEverythingOff(){
 }
 
 int checkWeirdSwitch(){
-  if(digitalRead(stateOnePin) && !stateOne){
-    stateOne = 1;
-    stateTwo = 0;
-    stateThree = 0;
+  if(digitalRead(stateOnePin)){
     Serial.println("StateOne");
     return 1;
-  } else if(digitalRead(stateTwoPin) && !stateTwo){
-    stateOne = 0;
-    stateTwo = 1;
-    stateThree = 0;
+  } else if(digitalRead(stateTwoPin)){
     Serial.println("StateTwo");
     return 2;
-  } else if(!digitalRead(stateOnePin) && !digitalRead(stateTwoPin) && !stateThree){
-    stateOne = 0;
-    stateTwo = 0;
-    stateThree = 1;
+  } else if(!digitalRead(stateOnePin) && !digitalRead(stateTwoPin)){
     Serial.println("StateThree");
     return 3;
+  } else {
+    Serial.println("error");
   }
-  Serial.println("Stop");
 }
 
 void buttonSetup()
