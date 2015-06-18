@@ -3,7 +3,7 @@
 
 const int numberButtons = 4;
 
-int buttonPin[numberButtons] = {3,4,5,6};
+int buttonPin[numberButtons] = {9,5,3,7};
 int buttonState[numberButtons];
 int lastButtonState[numberButtons];
 int lastDebounceTime[numberButtons];
