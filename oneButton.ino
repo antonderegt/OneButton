@@ -7,6 +7,7 @@ const int stateTwoPin = 6;
 const int turnOff = 0;
 
 int whatToSwitch = 0;
+int ledState = 0;
 
 int buttonPin[numberButtons] = {9,3,7,5};
 int buttonState[numberButtons];
@@ -27,10 +28,9 @@ void setup() {
   buttonSetup();
   pinMode(stateOnePin, INPUT);
   pinMode(stateTwoPin, INPUT);
-  Serial.begin(9600);
-  
+
     // Initialise the IO and ISR
-  vw_set_ptt_inverted(true);  // Required for DR3100
+  //  vw_set_ptt_inverted(true);  // Required for DR3100
   vw_setup(2000);	      // Bits per sec
 }
 
@@ -38,15 +38,12 @@ void loop() {
   whatToSwitch = checkWeirdSwitch();
   switch(whatToSwitch){
     case 1:
-    Serial.println("One");
       buttonHandler();
       break;
     case 2:
-    Serial.println("Two");
       ledHandler();
       break;
     case 3:
-    Serial.println("Three");
       turnEverythingOff();
       break;
     default:
@@ -81,7 +78,68 @@ void buttonHandler(){
 }
 
 void ledHandler(){
-  // turn LED strip on or off.
+  // read the state of the switch into a local variable:
+  for (int x = 0; x < numberButtons; x++){
+    int reading = digitalRead(buttonPin[x]);
+  
+    if (reading != lastButtonState[x]) {
+      // reset the debouncing timer
+      lastDebounceTime[x] = millis();
+    } 
+    
+    if ((millis() - lastDebounceTime[x]) > debounceDelay) {
+      if (reading != buttonState[x]) {
+        buttonState[x] = reading;
+  
+        // only toggle the LED if the new button state is HIGH
+        if (buttonState[x] == HIGH) {
+          switchLed(x);
+        }
+      }
+    }
+    
+    lastButtonState[x] = reading;
+  }
+}
+
+void switchLed(int x){
+  switch(x){
+    case 0:
+      msg = "brightnessMin";
+      vw_send((uint8_t *)msg, strlen(msg));
+      vw_wait_tx(); // Wait until the whole message is gone
+      delay(200);
+      break;
+    case 2:
+      msg = "brightnessPlus";
+      vw_send((uint8_t *)msg, strlen(msg));
+      vw_wait_tx(); // Wait until the whole message is gone
+      delay(200);
+      break;
+    case 3:
+      // switch color
+      
+        msg = "off";
+      
+      vw_send((uint8_t *)msg, strlen(msg));
+      vw_wait_tx(); // Wait until the whole message is gone
+      delay(200);
+      break;
+    case 1:
+//      if (ledState){
+//        msg = "on";
+//      }
+//      else {
+//        msg = "off";
+//      }
+
+      msg = "on";
+      
+      vw_send((uint8_t *)msg, strlen(msg));
+      vw_wait_tx(); // Wait until the whole message is gone
+      delay(200);
+      break;
+  }
 }
 
 void turnEverythingOff(){
@@ -102,9 +160,12 @@ void turnEverythingOff(){
         if (buttonState[x] == HIGH) {
           for (int j = 0; j < numberButtons; j++){
             transmitter.sendUnit(j, turnOff);
-            // delay ?
           }
-          // @TODO Turn LED strip off
+          // Turn off LED strip
+          msg = "off";
+          vw_send((uint8_t *)msg, strlen(msg));
+          vw_wait_tx(); // Wait until the whole message is gone
+          delay(200);
         }
       }
     }
@@ -115,17 +176,12 @@ void turnEverythingOff(){
 
 int checkWeirdSwitch(){
   if(digitalRead(stateOnePin)){
-    Serial.println("StateOne");
     return 1;
   } else if(digitalRead(stateTwoPin)){
-    Serial.println("StateTwo");
     return 2;
   } else if(!digitalRead(stateOnePin) && !digitalRead(stateTwoPin)){
-    Serial.println("StateThree");
     return 3;
-  } else {
-    Serial.println("error");
-  }
+  } 
 }
 
 void buttonSetup()
