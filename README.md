@@ -6,5 +6,6 @@ And at last... A TWELVE BUTTON COMMAND CONTROL CENTER!
 
 I use the standard KaKu protocol to switch the KaKu switches:
 * https://bitbucket.org/fuzzillogic/433mhzforarduino/wiki/Home 
-and the VirtualWire library to control an LED strip:
+
+And the VirtualWire library to control an LED strip:
 * https://www.pjrc.com/teensy/td_libs_VirtualWire.html 
