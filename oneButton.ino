@@ -65,25 +65,25 @@ void buttonHandler(){
       if (reading != buttonState[x]) {
         buttonState[x] = reading;
   
-        // only toggle the LED if the new button state is HIGH
+        // Only toggle kakuState and send it over 433MHz if the button state is HIGH
         if (buttonState[x] == HIGH) {
           kakuState[x] = !kakuState[x];
           transmitter.sendUnit(x, kakuState[x]);
         }
       }
     }
-    
+
+    // Remember the state of the button
     lastButtonState[x] = reading;
   }
 }
 
 void ledHandler(){
-  // read the state of the switch into a local variable:
+  // Needs to be refactored, this block is the same as the block above
   for (int x = 0; x < numberButtons; x++){
     int reading = digitalRead(buttonPin[x]);
   
     if (reading != lastButtonState[x]) {
-      // reset the debouncing timer
       lastDebounceTime[x] = millis();
     } 
     
@@ -91,7 +91,6 @@ void ledHandler(){
       if (reading != buttonState[x]) {
         buttonState[x] = reading;
   
-        // only toggle the LED if the new button state is HIGH
         if (buttonState[x] == HIGH) {
           switchLed(x);
         }
@@ -143,7 +142,7 @@ void switchLed(int x){
 }
 
 void turnEverythingOff(){
-  // read the state of the switch into a local variable:
+  // Also needs to be refactored
   for (int x = 0; x < numberButtons; x++){
     int reading = digitalRead(buttonPin[x]);
   
@@ -174,6 +173,7 @@ void turnEverythingOff(){
   }
 }
 
+// Check in which of three possible state the switch is in
 int checkWeirdSwitch(){
   if(digitalRead(stateOnePin)){
     return 1;
@@ -186,11 +186,12 @@ int checkWeirdSwitch(){
 
 void buttonSetup()
 {
+  // Setup for numberButtons buttons
   for (int x = 0; x < numberButtons; x++)
   {
     lastButtonState[x] = LOW;
     lastDebounceTime[x] = 0;
     kakuState[x] = 0;
-    pinMode(buttonPin[x], INPUT); //_PULLDOWN);
+    pinMode(buttonPin[x], INPUT); //_PULLUP); Hardware pull down is used
   }
 }
