@@ -68,7 +68,10 @@ void buttonHandler(){
         // Only toggle kakuState and send it over 433MHz if the button state is HIGH
         if (buttonState[x] == HIGH) {
           kakuState[x] = !kakuState[x];
-          transmitter.sendUnit(x, kakuState[x]);
+          // Make sure the message gets across
+          for (int i = 0; i < numberButtons; i++){
+            transmitter.sendUnit(x, kakuState[x]);
+          }
         }
       }
     }
@@ -92,7 +95,10 @@ void ledHandler(){
         buttonState[x] = reading;
   
         if (buttonState[x] == HIGH) {
-          switchLed(x);
+          // Make sure the message gets across
+          for (int i - 0; i < numberButtons; i++) {
+            switchLed(x);
+          }
         }
       }
     }
