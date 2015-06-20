@@ -122,24 +122,13 @@ void switchLed(int x){
       delay(200);
       break;
     case 3:
-      // switch color
-      
-        msg = "off";
-      
+      msg = "off";
       vw_send((uint8_t *)msg, strlen(msg));
       vw_wait_tx(); // Wait until the whole message is gone
       delay(200);
       break;
     case 1:
-//      if (ledState){
-//        msg = "on";
-//      }
-//      else {
-//        msg = "off";
-//      }
-
       msg = "on";
-      
       vw_send((uint8_t *)msg, strlen(msg));
       vw_wait_tx(); // Wait until the whole message is gone
       delay(200);
@@ -163,14 +152,14 @@ void turnEverythingOff(){
   
         // only toggle the LED if the new button state is HIGH
         if (buttonState[x] == HIGH) {
-          for (int j = 0; j < numberButtons; j++){
-            transmitter.sendUnit(j, turnOff);
+          for (int i = 0; i < numberButtons; i++){
+            // Turn off LED strip
+            switchLed(3);
+            
+            for (int j = 0; j < numberButtons; j++){
+              transmitter.sendUnit(j, turnOff);
+            }
           }
-          // Turn off LED strip
-          msg = "off";
-          vw_send((uint8_t *)msg, strlen(msg));
-          vw_wait_tx(); // Wait until the whole message is gone
-          delay(200);
         }
       }
     }
