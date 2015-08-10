@@ -69,8 +69,9 @@ void buttonHandler(){
         if (buttonState[x] == HIGH) {
           kakuState[x] = !kakuState[x];
           // Make sure the message gets across
-          for (int i = 0; i < numberButtons; i++){
+          for (int i = 0; i < 3; i++){
             transmitter.sendUnit(x, kakuState[x]);
+            delay(500);
           }
         }
       }
@@ -96,8 +97,9 @@ void ledHandler(){
   
         if (buttonState[x] == HIGH) {
           // Make sure the message gets across
-          for (int i - 0; i < numberButtons; i++) {
+          for (int i = 0; i < 3; i++) {
             switchLed(x);
+            delay(200);
           }
         }
       }
